@@ -6,6 +6,8 @@ public class Connect4Board {
     private static final int CONNECT4 = 4;
     private static final String UP = "UP";
     private static final String DOWN = "DOWN";
+    private static final int EMPTY_SLOT = 0;
+    private static final int NO_ROWS_LEFT = -1;
     private final int COLUMNS = 7;
     private final int ROWS = 6;
     private int[][] board = new int[ROWS][COLUMNS];
@@ -40,69 +42,71 @@ public class Connect4Board {
         System.out.println();
     }
 
-    public void playersMove(int color, int column) {
+    public boolean playersMove(int color, int column) {
         currentColumn = column;
-        for (int i = 0; i < ROWS; i++) {
-            if (board[i][currentColumn] == 0) {
-                board[i][currentColumn] = color;
-                currentRow = i;
-                if (!checkForWinnerOnHorizontal()) {
-                    if (!checkForWinnerOnVertical()) {
-                        if (!checkForWinnerOnDiagonal(UP)) {
-                            checkForWinnerOnDiagonal(DOWN);
-                        }
-                    }
-                }
-                return;
+        for (int row = 0; row < ROWS; row++) {
+            if (board[row][currentColumn] == EMPTY_SLOT) {
+                setPositionForToken(row, color);
+                return checkTheBoardForWinner();
             }
         }
+        return false;
+    }
+
+    private boolean checkTheBoardForWinner() {
+        if (!checkForWinnerOnHorizontal()) {
+            if (!checkForWinnerOnVertical()) {
+                if (!checkForWinnerOnDiagonal(UP)) {
+                    return checkForWinnerOnDiagonal(DOWN);
+                }
+            }
+        }
+        return true;
+    }
+
+    private void setPositionForToken(int row, int color) {
+        board[row][currentColumn] = color;
+        currentRow = row;
     }
 
     private boolean checkForWinnerOnDiagonal(String direction) {
         for (int row = 0; row < ROWS; row++) {
             for (int column = 0; column < COLUMNS; column++) {
-                if (direction == DOWN) {
-                    if (checkDiagonalDown(row, column)) {
-                        return true;
-                    }
-                } else if (direction == UP) {
-                    if (checkDiagonalUp(row, column)) {
-                        return true;
-                    }
+                if (checkDiagonal(row, column, direction)) {
+                    return true;
                 }
             }
         }
         return false;
     }
 
-    private boolean checkDiagonalDown(int row, int column) {
+    private boolean checkDiagonal(int row, int column, String direction) {
         for (; column < COLUMNS; column++) {
             if (tallyConnects(row, column)) {
                 if (checkForWinningMove()) {
                     return true;
                 }
-                row--;
-                if (row < 0) {
-                    break;
-                }
+            }
+            row = setNextRowForSearch(row, direction);
+            if (row == NO_ROWS_LEFT) {
+                break;
             }
         }
         return resetBothPlayersTally();
     }
 
-    private boolean checkDiagonalUp(int row, int column) {
-        for (; column < COLUMNS; column++) {
-            if (tallyConnects(row, column)) {
-                if (checkForWinningMove()) {
-                    return true;
-                }
-                row++;
-                if (row == ROWS) {
-                    break;
-                }
+    private int setNextRowForSearch(int row, String direction) {
+        if (direction.equals(DOWN)) {
+            if (--row < 0) {
+                return NO_ROWS_LEFT;
             }
         }
-        return resetBothPlayersTally();
+        if (direction.equals(UP)) {
+            if (++row == ROWS) {
+                return NO_ROWS_LEFT;
+            }
+        }
+        return row;
     }
 
     private boolean checkForWinnerOnVertical() {
