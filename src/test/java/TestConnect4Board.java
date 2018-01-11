@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 
@@ -12,7 +13,7 @@ public class TestConnect4Board {
     private static final int YELLOW_TOKEN = 1;
     private static final int RED_TOKEN = 2;
 
-    Connect4Board connect4Board = new Connect4Board();
+    private Connect4Board connect4Board = new Connect4Board();
 
     @Before
     public void beforeBoardGame() {
@@ -199,7 +200,26 @@ public class TestConnect4Board {
         connect4Board.playersMove(RED_TOKEN, 3);
 
         assertThat(connect4Board, hasProperty("winner", is("RED (" + RED_TOKEN + ") wins")));
+    }
 
+    @Test
+    public void testThatWhenTheColumnHasSpaceTheCheckReturnsTrue() {
+        connect4Board.playersMove(RED_TOKEN, 0);
+        connect4Board.playersMove(RED_TOKEN, 0);
+        connect4Board.playersMove(RED_TOKEN, 0);
+        connect4Board.playersMove(RED_TOKEN, 0);
+        connect4Board.playersMove(RED_TOKEN, 0);
+        assertEquals(connect4Board.doesColumnHaveEmptySlots(0), true);
+    }
 
+    @Test
+    public void testThatWhenTheColumnDoesNotHaveSpaceTheCheckReturnsFalse() {
+        connect4Board.playersMove(RED_TOKEN, 0);
+        connect4Board.playersMove(RED_TOKEN, 0);
+        connect4Board.playersMove(RED_TOKEN, 0);
+        connect4Board.playersMove(RED_TOKEN, 0);
+        connect4Board.playersMove(RED_TOKEN, 0);
+        connect4Board.playersMove(RED_TOKEN, 0);
+        assertEquals(connect4Board.doesColumnHaveEmptySlots(0), false);
     }
 }

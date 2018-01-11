@@ -1,23 +1,31 @@
 package neil.kata.connect4;
 
 public class Connect4Board {
-    private static final int YELLOW_TOKEN = 1;
-    private static final int RED_TOKEN = 2;
-    private static final int CONNECT4 = 4;
-    private static final String UP = "UP";
-    private static final String DOWN = "DOWN";
-    private static final int EMPTY_SLOT = 0;
-    private static final int NO_ROWS_LEFT = -1;
-    private final int COLUMNS = 7;
-    private final int ROWS = 6;
+
+    private static final int COLUMNS = 7;
+    private static final int ROWS = 6;
     private int[][] board = new int[ROWS][COLUMNS];
     private int currentColumn = -1, currentRow = -1;
     private int redConnects = 0, yellowConnects = 0;
+
+    private static final int YELLOW_TOKEN = 1;
+    private static final int RED_TOKEN = 2;
+    private static final int CONNECT4 = 4;
+    private static final int EMPTY_SLOT = 0;
+    private static final int NO_ROWS_LEFT = -1;
+
+    private static final String UP = "UP";
+    private static final String DOWN = "DOWN";
+
     private String winner = "";
     private static final String RED_WINNER = "RED (" + RED_TOKEN + ") wins";
     private static final String YELLOW_WINNER = "YELLOW (" + YELLOW_TOKEN + ") wins";
 
     public Connect4Board() {
+    }
+
+    public static int getNumberOfColumnsOnBoard() {
+        return COLUMNS;
     }
 
     public int getCurrentColumn() {
@@ -53,6 +61,15 @@ public class Connect4Board {
         return false;
     }
 
+    public boolean doesColumnHaveEmptySlots(int column) {
+        for (int row=0; row< ROWS; row++) {
+            if (board[row][column] == EMPTY_SLOT) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean checkTheBoardForWinner() {
         if (!checkForWinnerOnHorizontal()) {
             if (!checkForWinnerOnVertical()) {
@@ -61,6 +78,7 @@ public class Connect4Board {
                 }
             }
         }
+
         return true;
     }
 
@@ -72,7 +90,7 @@ public class Connect4Board {
     private boolean checkForWinnerOnDiagonal(String direction) {
         for (int row = 0; row < ROWS; row++) {
             for (int column = 0; column < COLUMNS; column++) {
-                if (checkDiagonal(row, column, direction)) {
+                if (diagonalSearch(row, column, direction)) {
                     return true;
                 }
             }
@@ -80,7 +98,7 @@ public class Connect4Board {
         return false;
     }
 
-    private boolean checkDiagonal(int row, int column, String direction) {
+    private boolean diagonalSearch(int row, int column, String direction) {
         for (; column < COLUMNS; column++) {
             if (tallyConnects(row, column)) {
                 if (checkForWinningMove()) {
@@ -172,4 +190,5 @@ public class Connect4Board {
         System.out.println(winner);
         return true;
     }
+
 }
